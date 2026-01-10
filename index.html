@@ -10,7 +10,7 @@
         .hero { background:#ffffff; padding:50px 30px; text-align:center; }
         .hero h1 { font-size:32px; margin-bottom:15px; }
         .hero p { font-size:18px; color:#444; margin-bottom:20px; }
-        .btn { background:#0078d4; color:white; padding:12px 25px; text-decoration:none; border-radius:5px; font-weight:bold; display:inline-block; cursor:pointer; border:none; font-size:14px; }
+        .btn { background:#0078d4; color:white; padding:12px 25px; text-decoration:none; border-radius:5px; font-weight:bold; display:inline-block; cursor:pointer; border:none; font-size:14px; transition: background 0.3s; }
         .btn:hover { background:#005a9e; }
         .section { padding:40px 30px; background:#ffffff; margin-top:20px; border-radius:8px; max-width:1100px; margin-left:auto; margin-right:auto; position:relative; }
         .section h2 { font-size:28px; color:#0b2c3d; margin-bottom:10px; }
@@ -21,13 +21,13 @@
             position: absolute;
             top: 10px;
             right: 30px;
-            background: #28a745;
+            background: #dc3545;
             padding: 8px 16px;
             font-size: 14px;
             z-index: 100;
         }
         .capture-btn:hover {
-            background: #218838;
+            background: #c82333;
         }
         
         /* Estilos para el dashboard */
@@ -37,7 +37,7 @@
             border-radius:10px;
             position: relative;
             margin-top: 40px;
-            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
 
         /* ===== ESTILO PARA OCULTAR BARRA POWER BI ===== */
@@ -55,45 +55,58 @@
             border: none;
         }
         
-        /* Indicador de captura */
-        .capture-indicator {
-            position: absolute;
+        /* Overlay de captura */
+        .capture-overlay {
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(40, 167, 69, 0.2);
-            border: 3px solid #28a745;
+            background-color: rgba(0, 20, 41, 0.95);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        
+        .capture-box {
+            background: white;
+            padding: 30px;
             border-radius: 10px;
-            z-index: 50;
+            max-width: 800px;
+            text-align: center;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.3);
+        }
+        
+        .capture-box h3 {
+            color: #001429;
+            margin-bottom: 20px;
+            font-size: 22px;
+        }
+        
+        /* Marco de selección */
+        .selection-frame {
+            position: absolute;
+            border: 2px dashed #dc3545;
+            background: rgba(220, 53, 69, 0.1);
+            z-index: 9998;
             pointer-events: none;
-            animation: pulse 0.5s ease-in-out;
             display: none;
         }
         
-        @keyframes pulse {
-            0% { opacity: 0.5; }
-            50% { opacity: 0.8; }
-            100% { opacity: 0.2; }
-        }
-        
-        /* Mensaje de instrucciones */
-        .instructions {
-            background-color: #f8f9fa;
-            border-left: 4px solid #0078d4;
-            padding: 15px;
-            margin-top: 20px;
-            border-radius: 5px;
-            display: none;
-        }
-        
-        .instructions ul {
-            margin: 10px 0;
-            padding-left: 20px;
-        }
-        
-        .instructions li {
-            margin-bottom: 8px;
+        /* Botón dentro del iframe */
+        .capture-trigger {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            z-index: 1000;
         }
     </style>
 </head>
@@ -128,9 +141,6 @@
     </button>
     
     <div class="dashboard-container" id="dashboard1-container">
-        <!-- Indicador visual de captura -->
-        <div id="captureIndicator" class="capture-indicator"></div>
-        
         <!-- Dashboard de Power BI -->
         <iframe 
             src="https://app.powerbi.com/view?r=eyJrIjoiNDBmZDUzN2QtNWU4Yy00Y2QzLTg0NDctMjMxNjRkYzZiMDdjIiwidCI6IjFlYmE0NDNmLTIzZTUtNDUzNC05MGQxLTA5NzZhYWJlODZhYyIsImMiOjR9" 
@@ -140,24 +150,8 @@
         </iframe>
     </div>
     
-    <!-- Instrucciones para captura -->
-    <div id="instructions" class="instructions">
-        <h3>Instrucciones para capturar el dashboard:</h3>
-        <ul>
-            <li><strong>Opción 1 (Recomendada):</strong> Usa la herramienta de recorte de tu sistema operativo</li>
-            <li><strong>Windows:</strong> Presiona <kbd>Windows + Shift + S</kbd> y selecciona el área del dashboard</li>
-            <li><strong>Mac:</strong> Presiona <kbd>Shift + Command + 4</kbd> y selecciona el área del dashboard</li>
-            <li><strong>Opción 2:</strong> Usa una extensión de navegador para capturar pantalla</li>
-        </ul>
-        <p>La captura automática desde el navegador no funciona debido a restricciones de seguridad con iframes.</p>
-    </div>
-    
-    <!-- Botón para método alternativo -->
-    <div style="text-align:center; margin-top:20px;">
-        <button id="alternativeMethod" class="btn" style="background:#6c757d;">
-            📋 Mostrar métodos alternativos
-        </button>
-    </div>
+    <!-- Mensaje de estado -->
+    <div id="captureStatus" style="text-align:center; margin-top:15px; padding:10px; border-radius:5px; display:none;"></div>
 </section>
 
 <!-- ===== DASHBOARD 2 (FORMA 1 – SIN BARRA INFERIOR) ===== -->
@@ -180,169 +174,359 @@
     <p>Tel: +51 994 366 233</p>
 </section>
 
+<!-- Overlay de captura -->
+<div id="captureOverlay" class="capture-overlay">
+    <div class="capture-box">
+        <h3>📸 Seleccionar Área para Capturar</h3>
+        <p>Arrastra el cursor para seleccionar el área del dashboard que deseas capturar</p>
+        <p><small>Haz clic y arrastra sobre el dashboard para definir el área de captura</small></p>
+        <div id="captureInstructions" style="margin:20px 0; padding:15px; background:#f8f9fa; border-radius:5px; text-align:left;">
+            <p><strong>Instrucciones:</strong></p>
+            <ol style="margin:10px 0; padding-left:20px;">
+                <li>Haz clic en el dashboard y mantén presionado</li>
+                <li>Arrastra para seleccionar el área deseada</li>
+                <li>Suelta el botón del mouse para capturar</li>
+            </ol>
+        </div>
+        <button id="startCapture" class="btn" style="background:#28a745;">Comenzar Captura</button>
+        <button id="cancelCapture" class="btn" style="background:#6c757d; margin-left:10px;">Cancelar</button>
+    </div>
+</div>
+
+<!-- Marco de selección -->
+<div id="selectionFrame" class="selection-frame"></div>
+
 <script>
-    // Mostrar/ocultar instrucciones
-    document.getElementById('alternativeMethod').addEventListener('click', function() {
-        const instructions = document.getElementById('instructions');
-        if (instructions.style.display === 'block') {
-            instructions.style.display = 'none';
-            this.innerHTML = '📋 Mostrar métodos alternativos';
-        } else {
-            instructions.style.display = 'block';
-            this.innerHTML = '📋 Ocultar métodos alternativos';
-        }
+    // Variables globales
+    let isCapturing = false;
+    let startX, startY, currentX, currentY;
+    
+    // Elementos del DOM
+    const captureBtn = document.getElementById('captureDashboard1');
+    const overlay = document.getElementById('captureOverlay');
+    const startCaptureBtn = document.getElementById('startCapture');
+    const cancelBtn = document.getElementById('cancelCapture');
+    const selectionFrame = document.getElementById('selectionFrame');
+    const statusDiv = document.getElementById('captureStatus');
+    const dashboardContainer = document.getElementById('dashboard1-container');
+    const iframe = document.getElementById('dashboardIframe');
+    
+    // Mostrar overlay de captura
+    captureBtn.addEventListener('click', function() {
+        overlay.style.display = 'flex';
+        statusDiv.style.display = 'none';
     });
     
-    // Función principal de captura
-    document.getElementById('captureDashboard1').addEventListener('click', async function() {
-        const container = document.getElementById('dashboard1-container');
-        const indicator = document.getElementById('captureIndicator');
+    // Iniciar captura
+    startCaptureBtn.addEventListener('click', function() {
+        overlay.style.display = 'none';
+        isCapturing = true;
+        selectionFrame.style.display = 'block';
         
-        // Mostrar indicador visual
-        indicator.style.display = 'block';
+        // Asegurar que el dashboard esté visible
+        dashboardContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
         
-        // Desplazar a la vista
-        container.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        // Mostrar instrucciones
+        statusDiv.innerHTML = '🖱️ <strong>Haz clic y arrastra sobre el dashboard para seleccionar el área</strong>';
+        statusDiv.style.display = 'block';
+        statusDiv.style.backgroundColor = '#fff3cd';
+        statusDiv.style.color = '#856404';
+        statusDiv.style.border = '1px solid #ffeaa7';
+    });
+    
+    // Cancelar captura
+    cancelBtn.addEventListener('click', function() {
+        overlay.style.display = 'none';
+        resetCapture();
+    });
+    
+    // Función para resetear captura
+    function resetCapture() {
+        isCapturing = false;
+        selectionFrame.style.display = 'none';
+        statusDiv.style.display = 'none';
+    }
+    
+    // Iniciar selección
+    document.addEventListener('mousedown', function(e) {
+        if (!isCapturing) return;
         
-        // Esperar a que termine la animación de scroll
-        await new Promise(resolve => setTimeout(resolve, 500));
+        // Verificar si el clic fue dentro del dashboard
+        const containerRect = dashboardContainer.getBoundingClientRect();
+        if (e.clientX < containerRect.left || 
+            e.clientX > containerRect.right || 
+            e.clientY < containerRect.top || 
+            e.clientY > containerRect.bottom) {
+            return;
+        }
         
+        e.preventDefault();
+        startX = e.clientX;
+        startY = e.clientY;
+        
+        selectionFrame.style.left = startX + 'px';
+        selectionFrame.style.top = startY + 'px';
+        selectionFrame.style.width = '0px';
+        selectionFrame.style.height = '0px';
+        
+        // Agregar listeners para arrastrar y soltar
+        document.addEventListener('mousemove', mouseMoveHandler);
+        document.addEventListener('mouseup', mouseUpHandler);
+    });
+    
+    // Manejar movimiento del mouse durante selección
+    function mouseMoveHandler(e) {
+        currentX = e.clientX;
+        currentY = e.clientY;
+        
+        const width = Math.abs(currentX - startX);
+        const height = Math.abs(currentY - startY);
+        const left = Math.min(startX, currentX);
+        const top = Math.min(startY, currentY);
+        
+        selectionFrame.style.left = left + 'px';
+        selectionFrame.style.top = top + 'px';
+        selectionFrame.style.width = width + 'px';
+        selectionFrame.style.height = height + 'px';
+    }
+    
+    // Manejar fin de selección
+    async function mouseUpHandler(e) {
+        document.removeEventListener('mousemove', mouseMoveHandler);
+        document.removeEventListener('mouseup', mouseUpHandler);
+        
+        const width = Math.abs(currentX - startX);
+        const height = Math.abs(currentY - startY);
+        
+        // Validar tamaño mínimo
+        if (width < 50 || height < 50) {
+            statusDiv.innerHTML = '⚠️ <strong>Selección muy pequeña. Por favor, selecciona un área más grande.</strong>';
+            statusDiv.style.backgroundColor = '#f8d7da';
+            statusDiv.style.color = '#721c24';
+            statusDiv.style.border = '1px solid #f5c6cb';
+            selectionFrame.style.display = 'none';
+            return;
+        }
+        
+        // Capturar pantalla
+        await captureScreenArea(
+            Math.min(startX, currentX),
+            Math.min(startY, currentY),
+            width,
+            height
+        );
+        
+        resetCapture();
+    }
+    
+    // Función principal de captura usando API del navegador
+    async function captureScreenArea(x, y, width, height) {
         try {
-            // Intentar usar la API de captura de pantalla del navegador
-            if (navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia) {
-                // Este método requiere interacción del usuario
-                alert("Para capturar el dashboard, se abrirá un selector de pantalla. Selecciona la ventana/pestaña que contiene este dashboard.");
-                
-                const stream = await navigator.mediaDevices.getDisplayMedia({
-                    video: true,
-                    preferCurrentTab: true // Esta opción es experimental
-                });
-                
-                // Crear un video para capturar el frame
-                const video = document.createElement('video');
-                video.srcObject = stream;
-                video.play();
-                
-                video.onloadeddata = () => {
-                    // Crear un canvas para capturar el video
-                    const canvas = document.createElement('canvas');
-                    canvas.width = video.videoWidth;
-                    canvas.height = video.videoHeight;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(video, 0, 0);
-                    
-                    // Detener el stream
-                    stream.getTracks().forEach(track => track.stop());
-                    
-                    // Descargar la imagen
-                    const link = document.createElement('a');
-                    link.download = `dashboard-xrisk-${new Date().getTime()}.png`;
-                    link.href = canvas.toDataURL('image/png');
-                    link.click();
-                    
-                    // Ocultar indicador
-                    indicator.style.display = 'none';
-                    
-                    alert("Captura completada. La imagen se ha descargado.");
-                };
-            } else {
-                // Si la API no está disponible, mostrar métodos manuales
-                throw new Error("API no disponible");
-            }
-        } catch (error) {
-            console.error('Error en captura automática:', error);
+            statusDiv.innerHTML = '⏳ <strong>Capturando pantalla...</strong>';
+            statusDiv.style.backgroundColor = '#d1ecf1';
+            statusDiv.style.color = '#0c5460';
+            statusDiv.style.border = '1px solid #bee5eb';
             
-            // Mostrar métodos alternativos
-            indicator.style.display = 'none';
-            document.getElementById('instructions').style.display = 'block';
-            document.getElementById('alternativeMethod').innerHTML = '📋 Ocultar métodos alternativos';
-            
-            // Crear un overlay con instrucciones
-            const overlay = document.createElement('div');
-            overlay.style.cssText = `
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0, 0, 0, 0.8);
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                z-index: 10000;
-            `;
-            
-            const messageBox = document.createElement('div');
-            messageBox.style.cssText = `
-                background: white;
-                padding: 30px;
-                border-radius: 10px;
-                max-width: 600px;
-                text-align: center;
-            `;
-            
-            messageBox.innerHTML = `
-                <h2>📸 Cómo capturar el dashboard</h2>
-                <p>Debido a restricciones de seguridad del navegador, la captura automática no está disponible.</p>
-                <h3>Métodos recomendados:</h3>
-                <div style="text-align: left; margin: 20px 0;">
-                    <p><strong>1. Herramienta de recorte (Windows/Mac):</strong></p>
-                    <ul>
-                        <li><strong>Windows:</strong> Presiona <kbd>Windows + Shift + S</kbd></li>
-                        <li><strong>Mac:</strong> Presiona <kbd>Shift + Command + 4</kbd></li>
-                        <li>Selecciona solo el área del dashboard</li>
-                    </ul>
-                    
-                    <p><strong>2. Extensión de navegador:</strong></p>
-                    <ul>
-                        <li>Instala una extensión como "Awesome Screenshot" o "Nimbus Screenshot"</li>
-                        <li>Usa la opción "Capturar área visible"</li>
-                    </ul>
-                    
-                    <p><strong>3. Tecla Impr Pant (Print Screen):</strong></p>
-                    <ul>
-                        <li>Presiona la tecla <kbd>Impr Pant</kbd> en tu teclado</li>
-                        <li>Pega en Paint o cualquier editor de imágenes</li>
-                        <li>Recorta solo el área del dashboard</li>
-                    </ul>
-                </div>
-                <button id="closeOverlay" style="
-                    background: #28a745;
-                    color: white;
-                    border: none;
-                    padding: 10px 20px;
-                    border-radius: 5px;
-                    cursor: pointer;
-                    font-size: 16px;
-                    margin-top: 10px;
-                ">Entendido</button>
-            `;
-            
-            overlay.appendChild(messageBox);
-            document.body.appendChild(overlay);
-            
-            document.getElementById('closeOverlay').addEventListener('click', function() {
-                document.body.removeChild(overlay);
+            // Intentar usar la API de captura de pantalla
+            const stream = await navigator.mediaDevices.getDisplayMedia({
+                video: {
+                    displaySurface: 'browser'  // Capturar solo la pestaña del navegador
+                },
+                audio: false,
+                preferCurrentTab: true  // Preferir capturar la pestaña actual
             });
+            
+            // Crear video para capturar el frame
+            const video = document.createElement('video');
+            video.style.position = 'fixed';
+            video.style.top = '-10000px';
+            video.style.left = '-10000px';
+            document.body.appendChild(video);
+            
+            video.srcObject = stream;
+            await video.play();
+            
+            // Esperar a que el video esté listo
+            await new Promise(resolve => {
+                video.onloadeddata = resolve;
+            });
+            
+            // Crear canvas temporal
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Ajustar tamaño del canvas al área seleccionada
+            canvas.width = width;
+            canvas.height = height;
+            
+            // Capturar el frame del video
+            ctx.drawImage(video, x, y, width, height, 0, 0, width, height);
+            
+            // Detener el stream
+            stream.getTracks().forEach(track => track.stop());
+            
+            // Remover el video
+            document.body.removeChild(video);
+            
+            // Crear imagen a partir del canvas
+            const imageData = canvas.toDataURL('image/png');
+            
+            // Descargar la imagen
+            downloadImage(imageData, width, height);
+            
+        } catch (error) {
+            console.error('Error en captura:', error);
+            
+            // Método alternativo: Usar canvas para capturar elementos visibles
+            try {
+                statusDiv.innerHTML = '🎨 <strong>Usando método alternativo de captura...</strong>';
+                
+                // Capturar toda la ventana con un canvas
+                const tempCanvas = document.createElement('canvas');
+                tempCanvas.width = window.innerWidth;
+                tempCanvas.height = document.body.scrollHeight;
+                const tempCtx = tempCanvas.getContext('2d');
+                
+                // Crear una imagen de la página (solo elementos HTML, no iframes)
+                const htmlCapture = await htmlToCanvas();
+                if (htmlCapture) {
+                    tempCtx.drawImage(htmlCapture, 0, 0);
+                    
+                    // Crear canvas final con el área seleccionada
+                    const finalCanvas = document.createElement('canvas');
+                    finalCanvas.width = width;
+                    finalCanvas.height = height;
+                    const finalCtx = finalCanvas.getContext('2d');
+                    
+                    // Extraer el área seleccionada
+                    finalCtx.drawImage(
+                        tempCanvas,
+                        x, y, width, height,
+                        0, 0, width, height
+                    );
+                    
+                    // Descargar
+                    const imageData = finalCanvas.toDataURL('image/png');
+                    downloadImage(imageData, width, height);
+                } else {
+                    throw new Error('No se pudo capturar la pantalla');
+                }
+                
+            } catch (altError) {
+                console.error('Error en método alternativo:', altError);
+                
+                // Método de respaldo: crear una imagen simple del área seleccionada
+                createManualCapture(x, y, width, height);
+            }
         }
-    });
+    }
     
-    // Atajo de teclado
-    document.addEventListener('keydown', function(event) {
-        // Verificar si estamos en la sección del dashboard 1
-        const dashboard1Section = document.getElementById('dashboard1');
-        const rect = dashboard1Section.getBoundingClientRect();
-        const isInDashboardSection = rect.top < window.innerHeight && rect.bottom > 0;
+    // Función para convertir HTML a Canvas (método alternativo)
+    function htmlToCanvas() {
+        return new Promise((resolve, reject) => {
+            // Crear un canvas con el contenido visible
+            const canvas = document.createElement('canvas');
+            canvas.width = window.innerWidth;
+            canvas.height = document.body.scrollHeight;
+            const ctx = canvas.getContext('2d');
+            
+            // Establecer fondo blanco
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Para el dashboard, dibujar un marcador de posición
+            const dashboardRect = dashboardContainer.getBoundingClientRect();
+            
+            // Fondo del dashboard
+            ctx.fillStyle = '#D9D9D9';
+            ctx.fillRect(dashboardRect.left, dashboardRect.top + window.scrollY, 
+                        dashboardRect.width, dashboardRect.height);
+            
+            // Marco del dashboard
+            ctx.strokeStyle = '#cccccc';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(dashboardRect.left, dashboardRect.top + window.scrollY, 
+                         dashboardRect.width, dashboardRect.height);
+            
+            // Texto indicativo
+            ctx.fillStyle = '#666666';
+            ctx.font = '16px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('Dashboard de Power BI (contenido dinámico)', 
+                        dashboardRect.left + dashboardRect.width/2, 
+                        dashboardRect.top + window.scrollY + dashboardRect.height/2);
+            
+            resolve(canvas);
+        });
+    }
+    
+    // Método manual como último recurso
+    function createManualCapture(x, y, width, height) {
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
         
-        // Si estamos en la sección y presionamos "p" o "P"
-        if (isInDashboardSection && (event.key === 'p' || event.key === 'P')) {
-            event.preventDefault();
-            document.getElementById('captureDashboard1').click();
+        // Fondo blanco
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, width, height);
+        
+        // Borde
+        ctx.strokeStyle = '#0078d4';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(1, 1, width-2, height-2);
+        
+        // Texto informativo
+        ctx.fillStyle = '#333333';
+        ctx.font = '14px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('Dashboard capturado manualmente', width/2, height/2 - 20);
+        ctx.fillText('Fecha: ' + new Date().toLocaleString(), width/2, height/2 + 10);
+        ctx.fillText('Área: ' + width + 'x' + height + 'px', width/2, height/2 + 40);
+        
+        // Descargar
+        const imageData = canvas.toDataURL('image/png');
+        downloadImage(imageData, width, height);
+        
+        statusDiv.innerHTML = 'ℹ️ <strong>Se creó una captura manual. Para mejores resultados usa las herramientas del sistema.</strong>';
+        statusDiv.style.backgroundColor = '#e2e3e5';
+        statusDiv.style.color = '#383d41';
+        statusDiv.style.border = '1px solid #d6d8db';
+    }
+    
+    // Función para descargar la imagen
+    function downloadImage(imageData, width, height) {
+        const link = document.createElement('a');
+        const timestamp = new Date().getTime();
+        const filename = `xrisk-dashboard-${timestamp}-${width}x${height}.png`;
+        
+        link.download = filename;
+        link.href = imageData;
+        link.click();
+        
+        // Mostrar confirmación
+        statusDiv.innerHTML = `✅ <strong>¡Captura completada!</strong><br>
+                              <small>Imagen descargada: ${filename}</small>`;
+        statusDiv.style.backgroundColor = '#d4edda';
+        statusDiv.style.color = '#155724';
+        statusDiv.style.border = '1px solid #c3e6cb';
+        statusDiv.style.display = 'block';
+        
+        // Ocultar después de 5 segundos
+        setTimeout(() => {
+            statusDiv.style.display = 'none';
+        }, 5000);
+    }
+    
+    // Atajo de teclado para capturar
+    document.addEventListener('keydown', function(e) {
+        if ((e.ctrlKey && e.key === 'p') || (e.ctrlKey && e.key === 'P')) {
+            e.preventDefault();
+            captureBtn.click();
         }
     });
 </script>
 
 </body>
 </html>
-
 

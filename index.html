@@ -54,6 +54,12 @@
 
 <!-- ===== DASHBOARD 1 (ORIGINAL CON BARRA) ===== -->
 <section id="dashboard1" class="section">
+    <button id="btnFotoContacto1"
+        style="position:absolute; top:15px; right:15px;
+               padding:8px 14px; background:#00b894; color:white;
+               border:none; border-radius:6px; font-weight:bold; cursor:pointer;">
+        📸 Foto sección
+    </button>
     <h2>Dashboard con barra inferior (original)</h2>
     <div style="background:#D9D9D9; padding:20px; border-radius:10px;">
         <iframe 
@@ -93,9 +99,9 @@
 
 
 <script>
-document.getElementById("btnFotoContacto").addEventListener("click", () => {
+document.getElementById("btnFotoContacto1").addEventListener("click", () => {
 
-    const section = document.getElementById("soluciones");
+    const section = document.getElementById("dashboard1");
 
     html2canvas(section, {
         scale: 2,

@@ -14,6 +14,21 @@
         .section { padding:40px 30px; background:#ffffff; margin-top:20px; border-radius:8px; max-width:1100px; margin-left:auto; margin-right:auto; }
         .section h2 { font-size:28px; color:#0b2c3d; margin-bottom:10px; }
         .section p { font-size:16px; color:#555; line-height:1.5; }
+
+        /* ===== ESTILO PARA OCULTAR BARRA POWER BI (FORMA 1) ===== */
+        .pbi-wrapper {
+            width: 100%;
+            height: 560px;
+            overflow: hidden;
+            position: relative;
+            border-radius: 8px;
+        }
+
+        .pbi-wrapper iframe {
+            width: 100%;
+            height: 700px;
+            border: none;
+        }
     </style>
 </head>
 <body>
@@ -24,10 +39,9 @@
         <span style="font-size:24px; font-weight:bold;">XRISK Demo</span>
     </div>
     <nav>
-        <a href="#dashboard">DASHBOARD</a>
+        <a href="#dashboard1">DASHBOARD 1</a>
+        <a href="#dashboard2">DASHBOARD 2 (sin barra)</a>
         <a href="#soluciones">SOLUCIONES</a>
-        <a href="#nosotros">NOSOTROS</a>
-        <a href="#blog">BLOG</a>
         <a href="#contacto">CONTACTO</a>
     </nav>
 </header>
@@ -35,44 +49,32 @@
 <!-- ===== HERO / TITULO PRINCIPAL ===== -->
 <section class="hero">
     <h1>Lleva tu empresa al siguiente nivel</h1>
-    <p>Somos una firma especializada en soluciones estratégicas, inteligencia artificial y análisis de datos para potenciar tu gestión y decisiones. :contentReference[oaicite:1]{index=1}</p>
-    <a href="#soluciones" class="btn">Ver soluciones</a>
+    <p>Somos una firma especializada en soluciones estratégicas, inteligencia artificial y análisis de datos.</p>
 </section>
 
-<!-- ===== SECCION “NOSOTROS” ===== -->
-<section id="nosotros" class="section">
-    <h2>Nosotros</h2>
-    <p>Somos una consultora estratégica que combina experiencia técnica con innovación para fortalecer el control interno, mejorar procesos y promover crecimiento sostenible. :contentReference[oaicite:2]{index=2}</p>
-</section>
-
-<!-- ===== SECCION “SOLUCIONES” ===== -->
-<section id="soluciones" class="section">
-    <h2>Soluciones a tu medida</h2>
-    <p>Ofrecemos gestión de riesgos financieros y no financieros, análisis de datos (Data & Analytics), inteligencia artificial aplicada y consultoría de negocios. :contentReference[oaicite:3]{index=3}</p>
-</section>
-
-<!-- ===== ESPACIO PARA TU DASHBOARD POWER BI ===== -->
-<section id="dashboard" class="section">
-    <h2>Dashboard de Indicadores</h2>
-
-    <!-- ===== DASHBOARD 1 ===== -->
-    <div style="background:#D9D9D9; padding:20px; border-radius:10px; margin-bottom:30px;">
+<!-- ===== DASHBOARD 1 (ORIGINAL CON BARRA) ===== -->
+<section id="dashboard1" class="section">
+    <h2>Dashboard con barra inferior (original)</h2>
+    <div style="background:#D9D9D9; padding:20px; border-radius:10px;">
         <iframe 
             src="https://app.powerbi.com/view?r=eyJrIjoiNDBmZDUzN2QtNWU4Yy00Y2QzLTg0NDctMjMxNjRkYzZiMDdjIiwidCI6IjFlYmE0NDNmLTIzZTUtNDUzNC05MGQxLTA5NzZhYWJlODZhYyIsImMiOjR9" 
             style="width:100%; height:560px; border:none; border-radius:8px;" 
-            allowFullScreen="true">
+            allowfullscreen="true">
         </iframe>
     </div>
+</section>
 
-    <!-- ===== DASHBOARD 2 ===== -->
+<!-- ===== DASHBOARD 2 (FORMA 1 – SIN BARRA INFERIOR) ===== -->
+<section id="dashboard2" class="section">
+    <h2>Dashboard sin barra inferior (Forma 1)</h2>
     <div style="background:#D9D9D9; padding:20px; border-radius:10px;">
-        <iframe 
-            src="https://app.powerbi.com/view?r=eyJrIjoiNDBmZDUzN2QtNWU4Yy00Y2QzLTg0NDctMjMxNjRkYzZiMDdjIiwidCI6IjFlYmE0NDNmLTIzZTUtNDUzNC05MGQxLTA5NzZhYWJlODZhYyIsImMiOjR9"
-            style="width:100%; height:560px; border:none; border-radius:8px;" 
-            allowFullScreen="true">
-        </iframe>
+        <div class="pbi-wrapper">
+            <iframe 
+                src="https://app.powerbi.com/view?r=eyJrIjoiNDBmZDUzN2QtNWU4Yy00Y2QzLTg0NDctMjMxNjRkYzZiMDdjIiwidCI6IjFlYmE0NDNmLTIzZTUtNDUzNC05MGQxLTA5NzZhYWJlODZhYyIsImMiOjR9"
+                allowfullscreen="true">
+            </iframe>
+        </div>
     </div>
-
 </section>
 
 <!-- ===== CONTACTO ===== -->
@@ -84,3 +86,4 @@
 
 </body>
 </html>
+

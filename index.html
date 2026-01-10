@@ -91,49 +91,29 @@
     <p>Tel: +51 994 366 233</p>
 </section>
 
+
 <script>
-document.getElementById("btnFotoContacto").addEventListener("click", async () => {
+document.getElementById("btnFotoContacto").addEventListener("click", () => {
 
     const section = document.getElementById("contacto");
-    const rect = section.getBoundingClientRect();
-    const dpr = window.devicePixelRatio || 1;
 
-    const stream = await navigator.mediaDevices.getDisplayMedia({
-        video: { frameRate: 60 },
-        audio: false
+    html2canvas(section, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: "#ffffff"
+    }).then(canvas => {
+
+        const link = document.createElement("a");
+        link.download = "contacto_xrisk.png";
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+
     });
-
-    const track = stream.getVideoTracks()[0];
-    const imageCapture = new ImageCapture(track);
-    const bitmap = await imageCapture.grabFrame();
-    track.stop();
-
-    const canvas = document.createElement("canvas");
-    canvas.width  = rect.width * dpr;
-    canvas.height = rect.height * dpr;
-
-    const ctx = canvas.getContext("2d");
-
-    ctx.drawImage(
-        bitmap,
-        rect.left * dpr,
-        rect.top * dpr,
-        rect.width * dpr,
-        rect.height * dpr,
-        0,
-        0,
-        canvas.width,
-        canvas.height
-    );
-
-    const link = document.createElement("a");
-    link.download = "contacto_xrisk.png";
-    link.href = canvas.toDataURL("image/png");
-    link.click();
 });
 </script>
 
 
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
 </body>
 </html>

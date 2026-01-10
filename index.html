@@ -39,7 +39,7 @@
             margin-top: 40px;
         }
 
-        /* ===== ESTILO PARA OCULTAR BARRA POWER BI (FORMA 1) ===== */
+        /* ===== ESTILO PARA OCULTAR BARRA POWER BI ===== */
         .pbi-wrapper {
             width: 100%;
             height: 560px;
@@ -54,29 +54,60 @@
             border: none;
         }
         
-        /* Indicador de captura */
-        .capture-indicator {
-            position: absolute;
+        /* Mensaje de captura */
+        .capture-message {
+            text-align: center;
+            margin-top: 15px;
+            color: #28a745;
+            font-weight: bold;
+            display: none;
+            padding: 10px;
+            background-color: #f0fff4;
+            border-radius: 5px;
+            border: 1px solid #c3e6cb;
+        }
+        
+        /* Overlay durante la captura */
+        .capture-overlay {
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(40, 167, 69, 0.2);
-            border: 3px solid #28a745;
-            border-radius: 10px;
-            z-index: 50;
-            pointer-events: none;
-            animation: pulse 0.5s ease-in-out;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
             display: none;
         }
         
-        @keyframes pulse {
-            0% { opacity: 0.5; }
-            50% { opacity: 0.8; }
-            100% { opacity: 0.2; }
+        .capture-frame {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            max-width: 90%;
+            max-height: 90%;
+            overflow: auto;
+            position: relative;
+        }
+        
+        .close-preview {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            font-weight: bold;
         }
     </style>
-    <!-- Incluir html2canvas para capturar elementos -->
+    <!-- Incluir html2canvas -->
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 </head>
 <body>
@@ -110,9 +141,6 @@
     </button>
     
     <div class="dashboard-container" id="dashboard1-container">
-        <!-- Indicador visual de captura -->
-        <div id="captureIndicator" class="capture-indicator"></div>
-        
         <!-- Dashboard de Power BI -->
         <iframe 
             src="https://app.powerbi.com/view?r=eyJrIjoiNDBmZDUzN2QtNWU4Yy00Y2QzLTg0NDctMjMxNjRkYzZiMDdjIiwidCI6IjFlYmE0NDNmLTIzZTUtNDUzNC05MGQxLTA5NzZhYWJlODZhYyIsImMiOjR9" 
@@ -122,9 +150,9 @@
     </div>
     
     <!-- Mensaje de confirmación -->
-    <p id="captureMessage" style="text-align:center; margin-top:15px; color:#28a745; font-weight:bold; display:none;">
+    <div id="captureMessage" class="capture-message">
         ¡Captura realizada! La imagen se ha descargado automáticamente.
-    </p>
+    </div>
 </section>
 
 <!-- ===== DASHBOARD 2 (FORMA 1 – SIN BARRA INFERIOR) ===== -->
@@ -147,60 +175,155 @@
     <p>Tel: +51 994 366 233</p>
 </section>
 
+<!-- Overlay para previsualización -->
+<div id="captureOverlay" class="capture-overlay">
+    <div class="capture-frame">
+        <button id="closePreview" class="close-preview">×</button>
+        <h3 style="margin-top: 0;">Vista previa de la captura</h3>
+        <img id="previewImage" src="" style="max-width: 100%; border: 1px solid #ddd;">
+        <div style="margin-top: 15px; text-align: center;">
+            <button id="downloadCapture" class="btn" style="background: #28a745;">Descargar Imagen</button>
+        </div>
+    </div>
+</div>
+
 <script>
-    // Función para capturar el dashboard
+    // Función para capturar el área visible del dashboard
     document.getElementById('captureDashboard1').addEventListener('click', function() {
         const container = document.getElementById('dashboard1-container');
-        const indicator = document.getElementById('captureIndicator');
         const message = document.getElementById('captureMessage');
-        
-        // Mostrar indicador visual
-        indicator.style.display = 'block';
+        const overlay = document.getElementById('captureOverlay');
+        const previewImage = document.getElementById('previewImage');
         
         // Ocultar mensaje anterior si existe
         message.style.display = 'none';
         
-        // Capturar el dashboard (con un pequeño retraso para que se vea el indicador)
+        // Desplazar la página para asegurar que el dashboard esté completamente visible
+        container.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        
+        // Esperar un momento para que termine la animación de scroll
         setTimeout(() => {
-            html2canvas(container, {
-                backgroundColor: '#D9D9D9', // Color de fondo del dashboard
-                scale: 1, // Escala de la imagen (1 = tamaño original)
-                useCORS: true, // Permitir imágenes de origen cruzado
-                logging: false // Desactivar logs en consola
+            // Obtener las coordenadas del contenedor
+            const rect = container.getBoundingClientRect();
+            
+            // Calcular las dimensiones de la captura
+            const captureWidth = rect.width;
+            const captureHeight = rect.height;
+            const captureX = rect.left + window.scrollX;
+            const captureY = rect.top + window.scrollY;
+            
+            // Usar html2canvas para capturar el área específica
+            html2canvas(document.body, {
+                x: captureX,
+                y: captureY,
+                width: captureWidth,
+                height: captureHeight,
+                backgroundColor: '#D9D9D9',
+                scale: 1,
+                useCORS: true,
+                logging: false,
+                windowWidth: document.documentElement.scrollWidth,
+                windowHeight: document.documentElement.scrollHeight
             }).then(canvas => {
                 // Crear un enlace para descargar la imagen
                 const link = document.createElement('a');
-                link.download = 'dashboard-xrisk-' + new Date().getTime() + '.png';
+                const timestamp = new Date().getTime();
+                link.download = `dashboard-xrisk-${timestamp}.png`;
                 link.href = canvas.toDataURL('image/png');
-                link.click();
                 
-                // Ocultar indicador visual
-                indicator.style.display = 'none';
+                // Mostrar vista previa
+                previewImage.src = link.href;
+                overlay.style.display = 'flex';
                 
-                // Mostrar mensaje de confirmación
-                message.style.display = 'block';
+                // Configurar botón de descarga
+                document.getElementById('downloadCapture').onclick = function() {
+                    link.click();
+                    overlay.style.display = 'none';
+                    message.style.display = 'block';
+                    
+                    // Ocultar mensaje después de 3 segundos
+                    setTimeout(() => {
+                        message.style.display = 'none';
+                    }, 3000);
+                };
                 
-                // Ocultar mensaje después de 3 segundos
-                setTimeout(() => {
-                    message.style.display = 'none';
-                }, 3000);
             }).catch(error => {
                 console.error('Error al capturar el dashboard:', error);
-                indicator.style.display = 'none';
-                alert('Hubo un error al capturar el dashboard. Por favor, intente nuevamente.');
+                
+                // Método alternativo: capturar toda la pantalla y luego recortar
+                alert('Capturando pantalla completa...');
+                
+                html2canvas(document.body, {
+                    backgroundColor: '#001429',
+                    scale: 1,
+                    useCORS: true,
+                    logging: false
+                }).then(fullCanvas => {
+                    // Crear un canvas para el área del dashboard
+                    const dashboardCanvas = document.createElement('canvas');
+                    dashboardCanvas.width = rect.width;
+                    dashboardCanvas.height = rect.height;
+                    const ctx = dashboardCanvas.getContext('2d');
+                    
+                    // Dibujar solo el área del dashboard
+                    ctx.drawImage(fullCanvas, 
+                        captureX, captureY, captureWidth, captureHeight, // Área fuente
+                        0, 0, captureWidth, captureHeight // Área destino
+                    );
+                    
+                    // Crear enlace para descargar
+                    const link = document.createElement('a');
+                    const timestamp = new Date().getTime();
+                    link.download = `dashboard-xrisk-${timestamp}.png`;
+                    link.href = dashboardCanvas.toDataURL('image/png');
+                    
+                    // Mostrar vista previa
+                    previewImage.src = link.href;
+                    overlay.style.display = 'flex';
+                    
+                    // Configurar botón de descarga
+                    document.getElementById('downloadCapture').onclick = function() {
+                        link.click();
+                        overlay.style.display = 'none';
+                        message.style.display = 'block';
+                        
+                        // Ocultar mensaje después de 3 segundos
+                        setTimeout(() => {
+                            message.style.display = 'none';
+                        }, 3000);
+                    };
+                });
             });
-        }, 300);
+        }, 500);
     });
     
-    // También podemos agregar funcionalidad para presionar la tecla "P" para capturar
+    // Cerrar la vista previa
+    document.getElementById('closePreview').addEventListener('click', function() {
+        document.getElementById('captureOverlay').style.display = 'none';
+    });
+    
+    // Cerrar la vista previa al hacer clic fuera de ella
+    document.getElementById('captureOverlay').addEventListener('click', function(e) {
+        if (e.target === this) {
+            this.style.display = 'none';
+        }
+    });
+    
+    // Atajo de teclado para capturar (P)
     document.addEventListener('keydown', function(event) {
-        // Verificar si estamos en la sección del dashboard 1
+        if ((event.key === 'p' || event.key === 'P') && event.ctrlKey) {
+            event.preventDefault();
+            document.getElementById('captureDashboard1').click();
+        }
+    });
+    
+    // También agregar atajo sin Ctrl cuando el dashboard está visible
+    document.addEventListener('keydown', function(event) {
         const dashboard1Section = document.getElementById('dashboard1');
         const rect = dashboard1Section.getBoundingClientRect();
         const isInDashboardSection = rect.top < window.innerHeight && rect.bottom > 0;
         
-        // Si estamos en la sección y presionamos "p" o "P"
-        if (isInDashboardSection && (event.key === 'p' || event.key === 'P')) {
+        if (isInDashboardSection && (event.key === 'p' || event.key === 'P') && !event.ctrlKey) {
             event.preventDefault();
             document.getElementById('captureDashboard1').click();
         }
@@ -209,4 +332,3 @@
 
 </body>
 </html>
-

@@ -78,11 +78,65 @@
 </section>
 
 <!-- ===== CONTACTO ===== -->
-<section id="contacto" class="section">
+<section id="contacto" class="section" style="position:relative;">
     <h2>Contacto</h2>
+
+    <!-- BOTON CAPTURA -->
+    <button onclick="capturarZona()" style="
+        position:absolute;
+        top:15px;
+        right:20px;
+        padding:10px 16px;
+        background:#e63946;
+        color:#fff;
+        border:none;
+        border-radius:6px;
+        font-weight:bold;
+        cursor:pointer;">
+        📸 Descargar Foto
+    </button>
+
     <p>Correo: cclaros@xrisk.pe</p>
     <p>Tel: +51 994 366 233</p>
 </section>
+
+<script>
+function capturarZona() {
+
+    /* ====== RECTÁNGULO DE CAPTURA ======
+       MODIFICA SOLO ESTOS NÚMEROS 👇 */
+
+    const posX = 150;   // ← mueve izquierda / derecha
+    const posY = 300;   // ↑ mueve arriba / abajo
+    const ancho = 900;  // ↔ ancho del rectángulo
+    const alto  = 450;  // ↕ alto del rectángulo
+
+    /* ================================= */
+
+    html2canvas(document.body).then(canvas => {
+
+        const recorte = document.createElement("canvas");
+        recorte.width  = ancho;
+        recorte.height = alto;
+
+        const ctx = recorte.getContext("2d");
+
+        ctx.drawImage(
+            canvas,
+            posX, posY, ancho, alto,  // zona origen
+            0, 0, ancho, alto         // zona destino
+        );
+
+        const link = document.createElement("a");
+        link.download = "captura_xrisk.png";
+        link.href = recorte.toDataURL("image/png");
+        link.click();
+    });
+}
+</script>
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
 </body>
 </html>

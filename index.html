@@ -6,7 +6,6 @@
     <title>XRISK Demo</title>
 
     <style>
-        /* ===== ESTILOS GENERALES ===== */
         body {
             font-family: Arial, sans-serif;
             margin:0;
@@ -44,24 +43,22 @@
             max-width:1100px;
             margin-left:auto;
             margin-right:auto;
-            position:relative; /* NECESARIO PARA EL BOTON FLOTANTE */
+            position:relative;
         }
 
-        /* ===== AREA QUE SE CAPTURA PARA EL PDF ===== */
         .pbi-wrapper {
             width: 100%;
             height: 560px;
-            overflow: hidden;      /* OCULTA LA BARRA INFERIOR */
+            overflow: hidden;
             border-radius: 8px;
         }
 
         .pbi-wrapper iframe {
             width: 100%;
-            height: 700px;         /* MAS ALTO PARA RECORTAR MENU */
+            height: 700px;
             border: none;
         }
 
-        /* ===== BOTON EXPORTAR PDF ===== */
         .btn-exportar {
             position:absolute;
             top:20px;
@@ -80,23 +77,21 @@
 
 <body>
 
-<!-- ===== CABECERA ===== -->
 <header>
     <div style="font-size:24px; font-weight:bold;">XRISK Demo</div>
     <nav>
         <a href="#dashboard1">Dashboard 1</a>
         <a href="#dashboard2">Dashboard 2</a>
+        <a href="#dashboard3">Dashboard 3 (Looker)</a>
         <a href="#contacto">Contacto</a>
     </nav>
 </header>
 
-<!-- ===== TITULO PRINCIPAL ===== -->
 <section class="hero">
     <h1>Lleva tu empresa al siguiente nivel</h1>
     <p>Soluciones estratégicas, inteligencia artificial y análisis de datos.</p>
 </section>
 
-<!-- ===== DASHBOARD NORMAL ===== -->
 <section id="dashboard1" class="section">
     <h2>Dashboard con barra inferior</h2>
     <iframe
@@ -105,16 +100,10 @@
     </iframe>
 </section>
 
-<!-- ===== DASHBOARD QUE SE EXPORTA A PDF ===== -->
 <section id="dashboard2" class="section">
     <h2>Dashboard sin barra inferior</h2>
+    <button class="btn-exportar" id="btnExportar">📄 Descargar PDF</button>
 
-    <!-- BOTON PARA GENERAR PDF -->
-    <button class="btn-exportar" id="btnExportar">
-        📄 Descargar PDF
-    </button>
-
-    <!-- SOLO ESTE BLOQUE SE CAPTURA -->
     <div id="areaDashboard2" class="pbi-wrapper">
         <iframe
             src="https://app.powerbi.com/view?r=eyJrIjoiNDBmZDUzN2QtNWU4Yy00Y2QzLTg0NDctMjMxNjRkYzZiMDdjIiwidCI6IjFlYmE0NDNmLTIzZTUtNDUzNC05MGQxLTA5NzZhYWJlODZhYyIsImMiOjR9"
@@ -123,40 +112,38 @@
     </div>
 </section>
 
-<!-- ===== CONTACTO ===== -->
+<!-- ===== DASHBOARD 3 – LOOKER STUDIO ===== -->
+<section id="dashboard3" class="section">
+    <h2>Dashboard Looker Studio</h2>
+    <iframe
+        src="https://https://lookerstudio.google.com/reporting/ba06d8a4-d596-4363-b8b8-f62b2f62a65e/page/7atkF"
+        style="width:100%; height:700px; border:none; border-radius:8px;"
+        allowfullscreen>
+    </iframe>
+</section>
+
 <section id="contacto" class="section">
     <h2>Contacto</h2>
     <p>Correo: cclaros@xrisk.pe</p>
     <p>Tel: +51 994 366 233</p>
 </section>
 
-<!-- ===== LIBRERIAS PARA CAPTURA Y PDF ===== -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <script>
-    /* ACCESO A jsPDF */
-    const { jsPDF } = window.jspdf;
+const { jsPDF } = window.jspdf;
 
-    /* EVENTO CLICK DEL BOTON */
-    document.getElementById("btnExportar").addEventListener("click", () => {
+document.getElementById("btnExportar").addEventListener("click", () => {
+    const area = document.getElementById("areaDashboard2");
 
-        // Selecciona SOLO el dashboard 2
-        const area = document.getElementById("areaDashboard2");
-
-        // Convierte el div en imagen
-        html2canvas(area, { scale: 2, useCORS: true }).then(canvas => {
-
-            // Convierte la imagen a PDF
-            const imgData = canvas.toDataURL("image/png");
-            const pdf = new jsPDF("l", "px", [canvas.width, canvas.height]);
-
-            pdf.addImage(imgData, "PNG", 0, 0, canvas.width, canvas.height);
-
-            // Descarga automática
-            pdf.save("Dashboard_XRISK.pdf");
-        });
+    html2canvas(area, { scale: 2, useCORS: true }).then(canvas => {
+        const imgData = canvas.toDataURL("image/png");
+        const pdf = new jsPDF("l", "px", [canvas.width, canvas.height]);
+        pdf.addImage(imgData, "PNG", 0, 0, canvas.width, canvas.height);
+        pdf.save("Dashboard_XRISK.pdf");
     });
+});
 </script>
 
 </body>

@@ -2,118 +2,111 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<title>XRISK Demo</title>
+    <meta charset="UTF-8">
+    <title>XRISK Demo</title>
+    <style>
+        /* ===== ESTILOS GENERALES ===== */
+        body { font-family: Arial, sans-serif; margin:0; padding:0; background:#001429; }
+        header { background:#000000; color:white; padding:15px 30px; display:flex; align-items:center; justify-content:space-between; }
+        header nav a { color:white; margin:0 15px; text-decoration:none; font-weight:bold; }
+        .hero { background:#ffffff; padding:50px 30px; text-align:center; }
+        .hero h1 { font-size:32px; margin-bottom:15px; }
+        .hero p { font-size:18px; color:#444; margin-bottom:20px; }
+        .btn { background:#0078d4; color:white; padding:12px 25px; text-decoration:none; border-radius:5px; font-weight:bold; }
+        .section { padding:40px 30px; background:#ffffff; margin-top:20px; border-radius:8px; max-width:1100px; margin-left:auto; margin-right:auto; }
+        .section h2 { font-size:28px; color:#0b2c3d; margin-bottom:10px; }
+        .section p { font-size:16px; color:#555; line-height:1.5; }
 
-<style>
-body {font-family:Arial;margin:0;background:#001429}
-header{background:#000;color:#fff;padding:15px 30px;display:flex;justify-content:space-between}
-header a{color:#fff;margin:0 15px;text-decoration:none;font-weight:bold}
-.hero{background:#fff;padding:50px;text-align:center}
-.section{background:#fff;margin:20px auto;padding:40px;border-radius:8px;max-width:1100px;position:relative}
-.pbi-wrapper{width:100%;height:560px;overflow:hidden;border-radius:8px}
-.pbi-wrapper iframe{width:100%;height:700px;border:0}
-.btn-exportar{position:absolute;top:20px;right:20px;background:#28a745;color:#fff;border:0;padding:10px 18px;border-radius:6px;cursor:pointer}
-</style>
+        /* ===== ESTILOS PARA POWER BI SIN BARRA ===== */
+        .pbi-wrapper {
+            width: 100%;
+            height: 560px;
+            overflow: hidden;
+            position: relative;
+            border-radius: 8px;
+        }
+        .pbi-wrapper iframe {
+            width: 100%;
+            height: 700px;
+            border: none;
+        }
+    </style>
 </head>
-
 <body>
 
+<!-- ===== CABECERA / MENU ===== -->
 <header>
-<div style="font-size:22px;font-weight:bold">XRISK Demo</div>
-<nav>
-<a href="#dashboard1">Dashboard 1</a>
-<a href="#dashboard2">Dashboard 2 PDF</a>
-<a href="#dashboard3">Looker Studio</a>
-<a href="#soloWeb">Solo Web</a>
-</nav>
+    <div class="logo">
+        <span style="font-size:24px; font-weight:bold;">XRISK Demo</span>
+    </div>
+    <nav>
+        <a href="#dashboard1">DASHBOARD 1</a>
+        <a href="#dashboard2">DASHBOARD 2 (sin barra)</a>
+        <a href="#dashboard_disponible">DISPONIBLE</a>
+        <a href="#soluciones">SOLUCIONES</a>
+        <a href="#contacto">CONTACTO</a>
+    </nav>
 </header>
 
+<!-- ===== HERO / TITULO PRINCIPAL ===== -->
 <section class="hero">
-<h1>Lleva tu empresa al siguiente nivel</h1>
+    <h1>Lleva tu empresa al siguiente nivel</h1>
+    <p>Somos una firma especializada en soluciones estratégicas, inteligencia artificial y análisis de datos.</p>
 </section>
 
-<!-- DASHBOARD 1 -->
+<!-- ===== DASHBOARD 1 (Power BI con barra inferior) ===== -->
 <section id="dashboard1" class="section">
-<h2>Dashboard Power BI Normal</h2>
-<iframe src="https://app.powerbi.com/view?r=eyJrIjoiNDBmZDUzN2QtNWU4Yy00Y2QzLTg0NDctMjMxNjRkYzZiMDdjIiwidCI6IjFlYmE0NDNmLTIzZTUtNDUzNC05MGQxLTA5NzZhYWJlODZhYyIsImMiOjR9"
-style="width:100%;height:560px;border:0"></iframe>
+    <h2>Dashboard con barra inferior (original)</h2>
+    <div style="background:#D9D9D9; padding:20px; border-radius:10px;">
+        <!-- Iframe que carga el dashboard de Power BI con barra inferior -->
+        <iframe 
+            src="https://app.powerbi.com/view?r=eyJrIjoiNDBmZDUzN2QtNWU4Yy00Y2QzLTg0NDctMjMxNjRkYzZiMDdjIiwidCI6IjFlYmE0NDNmLTIzZTUtNDUzNC05MGQxLTA5NzZhYWJlODZhYyIsImMiOjR9" 
+            style="width:100%; height:560px; border:none; border-radius:8px;" 
+            allowfullscreen="true">
+        </iframe>
+    </div>
 </section>
 
-<!-- DASHBOARD 2 -->
+<!-- ===== DASHBOARD 2 (Power BI sin barra inferior) ===== -->
 <section id="dashboard2" class="section">
-<h2>Dashboard Power BI PDF</h2>
-<button class="btn-exportar" id="btnPBI">📄 Descargar PDF</button>
-<div id="areaPBI" class="pbi-wrapper">
-<iframe src="https://app.powerbi.com/view?r=eyJrIjoiNDBmZDUzN2QtNWU4Yy00Y2QzLTg0NDctMjMxNjRkYzZiMDdjIiwidCI6IjFlYmE0NDNmLTIzZTUtNDUzNC05MGQxLTA5NzZhYWJlODZhYyIsImMiOjR9"></iframe>
-</div>
+    <h2>Dashboard sin barra inferior (Forma 1)</h2>
+    <div style="background:#D9D9D9; padding:20px; border-radius:10px;">
+        <!-- Wrapper que oculta la barra inferior de Power BI -->
+        <div class="pbi-wrapper">
+            <iframe 
+                src="https://app.powerbi.com/view?r=eyJrIjoiNDBmZDUzN2QtNWU4Yy00Y2QzLTg0NDctMjMxNjRkYzZiMDdjIiwidCI6IjFlYmE0NDNmLTIzZTUtNDUzNC05MGQxLTA5NzZhYWJlODZhYyIsImMiOjR9"
+                allowfullscreen="true">
+            </iframe>
+        </div>
+    </div>
 </section>
 
-<!-- DASHBOARD 3 LOOKER -->
-<section id="dashboard3" class="section">
-<h2>Dashboard Looker Studio</h2>
-<button class="btn-exportar" id="btnLooker">📄 Descargar PDF</button>
-<div id="areaLooker" style="width:100%;height:700px">
-<iframe 
-    src="https://lookerstudio.google.com/embed/reporting/ba06d8a4-d596-4363-b8b8-f62b2f62a65e/page/p_dhrvayvyzd"
-    style="width:100%;height:100%;border:0">
-</iframe>
-</div>
+<!-- ===== DASHBOARD STREAMLIT (Python) ===== -->
+<section id="dashboard_disponible" class="section">
+    <h2>Dashboard Disponible por Empresa</h2>
+    <p>Filtra las empresas y descarga la gráfica con un solo clic.</p>
+
+    <div style="background:#D9D9D9; padding:20px; border-radius:10px;">
+        <!-- Iframe que carga la app de Streamlit con gráficos interactivos -->
+        <iframe 
+            src="http://localhost:8501"
+            width="100%" 
+            height="700" 
+            style="border:none; border-radius:8px;">
+        </iframe>
+    </div>
 </section>
 
-<!-- DASHBOARD 4 SOLO WEB -->
-<section id="soloWeb" class="section">
-<h2>Dashboard Looker – Descarga directa Web</h2>
-<button class="btn-exportar" id="btnSoloWeb">📄 Descargar PDF</button>
-<div style="width:100%;height:700px">
-<iframe 
-    src="https://lookerstudio.google.com/embed/reporting/ba06d8a4-d596-4363-b8b8-f62b2f62a65e/page/p_dhrvayvyzd"
-    style="width:100%;height:100%;border:0">
-</iframe>
-</div>
+<!-- ===== CONTACTO ===== -->
+<section id="contacto" class="section">
+    <h2>Contacto</h2>
+    <p>Correo: cclaros@xrisk.pe</p>
+    <p>Tel: +51 994 366 233</p>
 </section>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
-<script>
-const {jsPDF}=window.jspdf;
-
-// Power BI PDF
-document.getElementById("btnPBI").onclick=()=>{
- html2canvas(document.getElementById("areaPBI"),{scale:2,useCORS:true}).then(c=>{
-  const pdf=new jsPDF("l","px",[c.width,c.height]);
-  pdf.addImage(c.toDataURL(),"PNG",0,0,c.width,c.height);
-  pdf.save("PowerBI_XRISK.pdf");
- });
-}
-
-// Looker PDF Apps Script
-document.getElementById("btnLooker").onclick=()=>{
- fetch("https://script.google.com/macros/s/AKfycbwWN6PHM9WLdwuY3JroK7Ro-PKdM44hXJIO1C_w_37JmGnaSbB6kbf2yfvfQSsj_wsHag/exec")
-   .then(()=>alert("Tu PDF fue generado y guardado en tu Google Drive"))
-   .catch(()=>alert("Error al generar el PDF"));
-}
-
-// Looker PDF desde Python Flask
-document.getElementById("btnSoloWeb").onclick = ()=>{
-  fetch("http://127.0.0.1:5000/exportar-looker")
-   .then(r => r.blob())
-   .then(blob => {
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "Looker_XRISK.pdf";
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-   })
-   .catch(()=>alert("Error conectando con el servidor Python"));
-}
-</script>
 
 </body>
 </html>
+
 
 
 
